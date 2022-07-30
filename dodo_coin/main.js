@@ -9,19 +9,32 @@ class Block {
        this.data= data;
        this.previousHash = previousHash;
        this.hash = this.calculateHash() ;
+       this.nonce = 0;
     }
 
 
    //here's the function to generate the unique hash
     calculateHash(){
-        return SHA256(this.index+ this.previousHash + this.timestamp +JSON.stringify(this.data)).toString();
+        return SHA256(this.index+ this.previousHash + this.timestamp +JSON.stringify(this.data) + this.nonce).toString();
 
     }
+    mineBlock(difficulty){
+        while(this.hash.substring(0 , difficulty) !== Array(difficulty + 1).join("0")) {
+            this.nonce++;
+            this.hash = this.calculateHash();
+        }
+
+        console.log("Block Mined : " + this.hash)
+    }
+
 }
+
+
 
 class Blockchain{
     constructor(){
         this.chain =[this.createGenesisBlock()];
+        this.difficulty = 2;
     }
 
 
@@ -35,7 +48,8 @@ class Blockchain{
 
     addBlock(newBlock){
         newBlock.previousHash = this.getLastBlock().hash;
-        newBlock.hash = newBlock.calculateHash();
+        // newBlock.hash = newBlock.calculateHash();
+        newBlock.mineBlock(this.difficulty)
         this.chain.push(newBlock);
     }
 
@@ -71,7 +85,11 @@ class Blockchain{
 }
 
 let dodoCoin = new Blockchain()
-dodoCoin.addBlock(new Block(1 , "29/07/2022" , {amount : 4 , detail :"to self" }))
+
+console.log('Mining block 1....')
+dodoCoin.addBlock(new Block(1 , "29/07/2022" , {amount : 04 , detail :"to self" }))
+
+console.log('Mining block 2....')
 dodoCoin.addBlock(new Block(2 , "29/07/2022", {amount: 08, detail : "to self"}))
-console.log( JSON.stringify(dodoCoin , null , 3) + dodoCoin.isChainValid()  +'\n')
+//console.log( JSON.stringify(dodoCoin , null , 3) + dodoCoin.isChainValid()  +'\n')
 //console.log(JSON.stringify(dodoCoin , null , 3))
